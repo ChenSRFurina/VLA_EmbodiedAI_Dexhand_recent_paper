@@ -1,0 +1,747 @@
+{
+  "asOf": "2026-10-13",
+  "scope": "2026 正式会议年份；预印本可在 2025 年首次发布。精选代表性清单，非穷尽排名。",
+  "papers": [
+    {
+      "id": "robocasa",
+      "name": "RoboCasa365",
+      "title": "RoboCasa365: A Large-Scale Simulation Framework for Training and Benchmarking Generalist Robots",
+      "venue": "ICLR",
+      "track": "Embodied AI",
+      "priority": "P1",
+      "status": "会议官方论文页已核实",
+      "tags": [
+        "评测",
+        "移动操作",
+        "长程任务"
+      ],
+      "problem": "许多机器人论文只在少量桌面任务上测试，难以判断提升来自通用能力、任务记忆还是场景拟合。它把问题改为：在任务、厨房布局和训练规模改变时，通用策略还能完成多少真实结构的家务？",
+      "method": [
+        "定义 365 个家务任务和 2,500 个厨房环境，覆盖原子技能、技能组合、语义理解与记忆需求。",
+        "同时提供人类遥操作与合成示范；通过多任务学习、预训练后迁移和终身学习三种协议，分别测试规模、组合泛化和遗忘。",
+        "将已见活动与未见组合分开，并报告任务级成功率，避免用单一容易任务的高分代表整体能力。"
+      ],
+      "why": "方法价值在于把研究变量拆开：更多轨迹、更多任务和更多环境不是同一个扩展方向。它适合作为判断后续 VLA 论文实验力度的参照。",
+      "evidence": "官方摘要给出 600+ 小时人类示范和 1,600+ 小时合成示范。论文的顺序学习实验显示，学习更长任务时旧任务能力明显下降。",
+      "limit": "阅读判断：它仍是仿真评测，不能替代真实接触与硬件可靠性测试；与旧结果比较时应注意官方更新过任务 horizon。",
+      "read": "先看任务划分与泛化协议，再看数据规模、环境变化及终身学习实验。",
+      "links": [
+        [
+          "论文与会议",
+          "https://proceedings.iclr.cc/paper_files/paper/2026/hash/a05003fdb1e9562ab0c0a9719ea4de10-Abstract-Conference.html"
+        ],
+        [
+          "全文",
+          "https://arxiv.org/html/2603.04356"
+        ],
+        [
+          "项目与代码入口",
+          "https://robocasa.ai/"
+        ]
+      ]
+    },
+    {
+      "id": "astranav",
+      "name": "AstraNav-Memory",
+      "title": "AstraNav-Memory: Contexts Compression for Long Memory",
+      "venue": "CVPR",
+      "track": "Embodied AI",
+      "priority": "P1",
+      "status": "CVF 正式论文集已核实",
+      "tags": [
+        "导航",
+        "长期记忆",
+        "视觉压缩"
+      ],
+      "problem": "连续导航中，机器人应记住此前去过的房间和见过的物体。逐帧保存视觉 token 会耗尽上下文；先检测物体、重建地图再保存，又容易让上游感知错误传播。",
+      "method": [
+        "以图像为长期记忆单元，用冻结 DINOv3 特征和轻量 PixelUnshuffle+Conv 模块压缩视觉上下文。",
+        "每幅图约保留 30 个 token，较原生视觉表示压缩约 10–20 倍，使数百帧历史可以一起进入策略上下文。",
+        "将压缩器与基于 Qwen2.5-VL 的导航策略耦合，让训练同时优化信息保留与导航决策。"
+      ],
+      "why": "我的理解：关键是保存对以后决策有用的信息。压缩太强会丢失空间线索，太弱则历史长度受限，因此要研究记忆容量与单帧精度的平衡。",
+      "evidence": "在 GOAT-Bench 和 HM3D-OVON 上评测陌生环境探索及熟悉环境到达目标；压缩率消融支持适度压缩优于一味增加压缩。",
+      "limit": "阅读判断：图像历史仍可能混淆重复房间；这里的导航记忆不等于可用于多指接触控制的精细几何地图。",
+      "read": "重点读视觉 tokenizer、历史帧组织与压缩率消融；和 MemoryVLA 比较保存整帧历史与检索语义／感知条目的差异。",
+      "links": [
+        [
+          "会议论文",
+          "https://openaccess.thecvf.com/content/CVPR2026/html/Hu_AstraNav-Memory_Contexts_Compression_for_Long_Memory_CVPR_2026_paper.html"
+        ],
+        [
+          "论文",
+          "https://arxiv.org/abs/2512.21627"
+        ],
+        [
+          "官方代码",
+          "https://github.com/amap-cvlab/AstraNav-Memory"
+        ]
+      ]
+    },
+    {
+      "id": "wholebody",
+      "name": "WholeBodyVLA",
+      "title": "WholeBodyVLA: Towards Unified Latent VLA for Whole-Body Loco-Manipulation Control",
+      "venue": "ICLR",
+      "track": "Embodied AI",
+      "priority": "P1",
+      "status": "ICLR 官方收录与正式稿标记已核实",
+      "tags": [
+        "人形机器人",
+        "全身控制",
+        "潜在动作"
+      ],
+      "problem": "把导航与操作按顺序拼接，常出现走到了目标附近却无法稳定抓取的情况。问题同时来自全身示范稀缺，以及低层行走控制对微小进退、转身和下蹲执行不准。",
+      "method": [
+        "从无动作标签的第一视角视频学习离散潜在动作；对行走与操作分别训练 latent action model，避免两类视觉变化相互混淆。",
+        "用潜在标签联合训练高层 VLA，再用机器人遥操作数据微调动作解码器，输出上身关节目标及下身运动指令。",
+        "设计面向操作的 LMO 强化学习控制器，精准实现进退、转身、下蹲等必要动作，将高层意图接到稳定的低层执行。"
+      ],
+      "why": "它提醒我们：VLA 决策正确仍可能执行失败。视频扩展知识来源与低层控制精度必须同时解决，才会扩大实际操作工作空间。",
+      "evidence": "在 AgiBot X2 上验证搬运、下蹲放置和推车等全身任务；论文分别消融视频预训练与 LMO 控制器。",
+      "limit": "阅读判断：无动作标签视频用于预训练，落地仍使用机器人遥操作微调；不能据此理解为完全零机器人数据或已经解决精细指内操作。",
+      "read": "读 latent action 构造、机器人动作对齐及 LMO 消融；分开统计高层选错动作和低层执行失败。",
+      "links": [
+        [
+          "ICLR 官方收录",
+          "https://proceedings.iclr.cc/papers/search?q=Manipulating"
+        ],
+        [
+          "全文",
+          "https://arxiv.org/html/2512.11047"
+        ],
+        [
+          "项目",
+          "https://opendrivelab.com/WholeBodyVLA"
+        ]
+      ]
+    },
+    {
+      "id": "egodex",
+      "name": "EgoDex",
+      "title": "EgoDex: Learning Dexterous Manipulation from Large-Scale Egocentric Video",
+      "venue": "ICLR",
+      "track": "DexHand",
+      "priority": "P0",
+      "status": "ICLR 官方列表与 arXiv 会议信息已核实",
+      "tags": [
+        "人类视频",
+        "数据集",
+        "3D 手部轨迹"
+      ],
+      "problem": "普通人类视频数量大，却往往没有精确手指姿态，也未围绕操作任务采集。高自由度机器人学习需要的是画面与细粒度运动对应关系，而不是只有动作类别。",
+      "method": [
+        "用 Apple Vision Pro 在录制时同步获取第一视角视频、三维手及手指跟踪；利用校准多相机和设备 SLAM 建立空间对应。",
+        "采集 829 小时、194 类桌面操作，覆盖系鞋带、折叠衣物等复杂接触行为。",
+        "训练与评估手部轨迹预测的模仿学习模型，同时提供数据与评价接口，为后续人类视频预训练提供共同起点。"
+      ],
+      "why": "把手指动作标签从昂贵的事后重建前移到采集阶段，降低了视频监督的不确定性。它是理解 DexWM 等论文数据来源的重要背景。",
+      "evidence": "829 小时与 194 类任务来自最新 arXiv 摘要；2025 年首次发布，正式会议归属为 ICLR 2026。",
+      "limit": "阅读判断：准确的人手运动仍不是机器人关节目标，也不直接给出接触力。还需要解决本体差异、物理可行性及触觉信息缺失。",
+      "read": "先看数据采集和标注坐标，再看训练／测试分割；与 DexImit 的单目重建路线对照。",
+      "links": [
+        [
+          "论文",
+          "https://arxiv.org/abs/2505.11709"
+        ],
+        [
+          "官方数据与代码",
+          "https://github.com/apple-aiml-research/ml-egodex"
+        ],
+        [
+          "ICLR 官方列表",
+          "https://iclr.cc/Downloads/2026"
+        ]
+      ]
+    },
+    {
+      "id": "memory",
+      "name": "MemoryVLA",
+      "title": "MemoryVLA: Perceptual-Cognitive Memory in Vision-Language-Action Models for Robotic Manipulation",
+      "venue": "ICLR",
+      "track": "VLA",
+      "priority": "P0",
+      "status": "ICLR 官方收录与作者项目已核实",
+      "tags": [
+        "记忆",
+        "部分可观测",
+        "长程任务"
+      ],
+      "problem": "当前画面相同，正确动作却可能不同：按钮是否已按过、物体刚从哪边移动、被遮住前目标在哪。单帧 VLA 无法恢复任务历史，直接增加历史帧又带来冗余和计算成本。",
+      "method": [
+        "将当前观测编码成保留视觉细节的 perceptual tokens 与高层语义的 cognitive token，两种信息一起进入记忆库。",
+        "用当前工作记忆查询历史条目，通过 gate 自适应融合当前和检索到的信息，再条件化 diffusion action expert 输出动作片段。",
+        "容量满时合并时间相邻且语义相似的条目，保留较长历史中的关键变化，而不是简单 FIFO 删除最早帧。"
+      ],
+      "why": "细节用于判断位置与状态，语义用于检索任务相关事件。两者互补；它解决的是决策所需的历史状态恢复。",
+      "evidence": "SimplerEnv-Bridge 消融中，认知记忆 63.5%、感知记忆 64.6%、两者结合 71.9%；门控和合并也分别有贡献。",
+      "limit": "阅读判断：长任务有收益不等于真正使用记忆。优先看遮挡、相同画面不同历史的任务，以及检索可视化；扩展版 MemoryVLA++ 应与会议原版区分。",
+      "read": "精读 §3.3 的检索、门控、合并及记忆类型消融；先理解为什么历史信息在这些任务里不可替代。",
+      "links": [
+        [
+          "全文",
+          "https://arxiv.org/html/2508.19236"
+        ],
+        [
+          "作者讲解、视频与代码入口",
+          "https://shihao1895.github.io/MemoryVLA/"
+        ],
+        [
+          "会议官方收录",
+          "https://proceedings.iclr.cc/papers/search?q=Manipulating"
+        ]
+      ]
+    },
+    {
+      "id": "pose",
+      "name": "Pose-VLA",
+      "title": "Universal Pose Pretraining for Generalizable Vision-Language-Action Policies",
+      "venue": "RSS",
+      "track": "VLA",
+      "priority": "P0",
+      "status": "RSS 官方录用列表已核实",
+      "tags": [
+        "3D 表征",
+        "预训练",
+        "跨本体"
+      ],
+      "problem": "会识别杯子不等于知道如何抓取杯子。VLM 的语义监督可能忽视小幅三维位姿变化；直接用稀疏且机器人特有的动作监督，还会把空间理解与本体适配纠缠在一起。",
+      "method": [
+        "把类别、图像中心和相机坐标系中的 3D 位姿组织为结构化 pose tokens；结合 RGB、深度和相机内参提供几何线索。",
+        "先用通用 3D 数据学空间 grounding，再把机器人轨迹变换到同一相机坐标系中做运动对齐预训练。",
+        "最后接轻量动作专家，在目标机器人动作空间中微调，让通用空间知识与具体执行接口分别学习。"
+      ],
+      "why": "统一的是可共享的空间几何，而不要求不同机器人的关节含义相同。这比单纯给 VLM 增加参数更直接地针对控制所需的精度。",
+      "evidence": "摘要报告 RoboTwin 2.0 平均成功率 79.5%、LIBERO 96.0%；真机实验每任务使用 100 条示范。数值属于各自协议。",
+      "limit": "阅读判断：几何先验依赖深度、内参与坐标变换质量；动作专家仍需适配。应和仅增加数据规模的对照分开比较。",
+      "read": "读 pose token 格式、坐标变换与两阶段预训练；重点看基座坐标与相机坐标消融。",
+      "links": [
+        [
+          "RSS 论文页",
+          "https://roboticsconference.org/2026/program/papers/145/"
+        ],
+        [
+          "全文",
+          "https://arxiv.org/html/2602.19710"
+        ],
+        [
+          "摘要",
+          "https://arxiv.org/abs/2602.19710"
+        ]
+      ]
+    },
+    {
+      "id": "halo",
+      "name": "HALO",
+      "title": "HALO: A Unified Vision-Language-Action Model for Embodied Multimodal Chain-of-Thought Reasoning",
+      "venue": "ICML",
+      "track": "VLA",
+      "priority": "P1",
+      "status": "ICML 官方列表与作者仓库已核实",
+      "tags": [
+        "多模态推理",
+        "视觉子目标",
+        "MoT"
+      ],
+      "problem": "只把图像和指令映射到动作，遇到多步骤或新场景时缺少显式计划；仅用文字 CoT 又可能不知道计划对应的空间目标长什么样。",
+      "method": [
+        "按文字推理 → 视觉子目标预测 → 条件动作生成的顺序，让任务分解同时落到文字和画面。",
+        "用 Mixture-of-Transformers 为语义、视觉预测和动作分别分配专家，通过受约束的注意力协同，避免未来信息泄漏。",
+        "先联合预训练 VQA、未来帧生成和动作预测，再用自动合成的 EM-CoT 数据微调完整推理链。"
+      ],
+      "why": "我的理解：视觉子目标充当文字计划到精确控制之间的接口。最值得问的是，它是否改善了动作，而不只是让解释更自然。",
+      "evidence": "RoboTwin 2.0：HALO 的 Easy/Hard 均值为 80.5%/26.4%，无 EM-CoT 版本为 75.3%/21.2%。大幅领先其他系统不能全部归因于 CoT。",
+      "limit": "阅读判断：额外生成步骤有延迟且可能传播错误子目标；应使用同一骨干的无 CoT 消融衡量净收益。Hard 设置绝对成功率仍有限。",
+      "read": "读三专家协同、注意力 mask、训练数据合成；重点比较 HALO 与 HALO-w/o EM-CoT。",
+      "links": [
+        [
+          "全文",
+          "https://arxiv.org/html/2602.21157"
+        ],
+        [
+          "官方代码与方法讲解",
+          "https://github.com/qshou-coder/HALO"
+        ],
+        [
+          "ICML 官方列表",
+          "https://icml.cc/Downloads/2026"
+        ]
+      ]
+    },
+    {
+      "id": "simple",
+      "name": "SimpleVLA-RL",
+      "title": "SimpleVLA-RL: Scaling VLA Training via Reinforcement Learning",
+      "venue": "ICLR",
+      "track": "VLA",
+      "priority": "P0",
+      "status": "ICLR 正式论文页已核实",
+      "tags": [
+        "强化学习",
+        "GRPO",
+        "数据效率"
+      ],
+      "problem": "SFT 主要复制示范，偏离示范分布后难以纠错；扩大高质量示范又昂贵。论文研究能否利用环境最终成败，让一个已有基础能力的 VLA 在交互中学到更有效动作。",
+      "method": [
+        "从 SFT 模型起步，在仿真中在线采样多条轨迹，以最终任务成功／失败提供 1／0 结果奖励。",
+        "用组内回报构造相对优势并做 GRPO 更新；动态采样过滤全成功或全失败的组，避免相对优势为零。",
+        "增大探索温度、调整 clipping，并优化训练、推理与并行渲染，解决机器人 rollout 比文本生成慢的工程瓶颈。"
+      ],
+      "why": "更新目标从像不像示范转为能不能完成任务。但稀疏结果奖励需要偶尔成功的探索，否则无法区分好坏轨迹。",
+      "evidence": "论文报告每任务一条示范冷启动时，LIBERO-Long 从 17.1% 提升到 91.7%；正式稿也指出零初始成功率时 RL 完全失败，低于约 5% 时收益很弱。",
+      "limit": "阅读判断：结果是减少人工示范，不是取消交互数据和计算成本；仿真中的奖励与新动作发现也不能自动证明广泛现实泛化。",
+      "read": "精读动态采样、探索增强、结果奖励和失败模式；核查同等示范数量及额外 rollout 成本。",
+      "links": [
+        [
+          "正式会议页",
+          "https://proceedings.iclr.cc/paper_files/paper/2026/hash/cbfbcb4da14235bd69b134070898ae9d-Abstract-Conference.html"
+        ],
+        [
+          "全文",
+          "https://arxiv.org/html/2509.09674"
+        ],
+        [
+          "官方代码",
+          "https://github.com/PRIME-RL/SimpleVLA-RL"
+        ]
+      ]
+    },
+    {
+      "id": "vlact",
+      "name": "VLAct",
+      "title": "Beyond Data Scaling: Representation-Centric Continued Pre-training for Vision-Language-Action Models",
+      "venue": "NeurIPS",
+      "track": "VLA",
+      "priority": "P0",
+      "status": "NeurIPS 官方 2026 列表已核实；会议尚未举行",
+      "tags": [
+        "持续预训练",
+        "表征迁移",
+        "多动作头"
+      ],
+      "problem": "有限机器人轨迹可能只让骨干适应某个动作头，甚至损伤原有视觉语言知识。问题变为：在固定数据预算下，如何让预训练后的表征迁移到新的任务、动作头和机器人？",
+      "method": [
+        "冻结视觉编码器和语言模型下半部分，并混入 caption 监督，保护已有视觉语义先验；下游微调重新解冻。",
+        "用 OFT、PI 与 GR00T 三种动作头共同监督同一骨干；下游丢弃这些头，接全新初始化的任务动作头检验迁移。",
+        "只对物理意义一致的动作维度共享坐标；本体特有维度分开，屏蔽未激活维度，并对周期关节采用 wrap-aware loss。"
+      ],
+      "why": "多个解码器迫使骨干保留对多种控制接口都有用的知识。新动作头评测是区分共享表征改善与单一头拟合的重要设计。",
+      "evidence": "匹配 Qwen3VL-OFT 对照下，LIBERO-Plus 报告 82.6%、提升 7.6 个百分点；GR-1 未进入持续预训练，但其下游评测仍使用微调数据。",
+      "limit": "阅读判断：20% 下游数据迁移不等于零样本；不同公开系统之间的比较并非完全受控。会议列表标题省略了 Continued，与作者最新标题略有差异。",
+      "read": "先看冻结范围、三头训练和部分统一动作空间；优先看匹配骨干对照及新动作头迁移。",
+      "links": [
+        [
+          "全文",
+          "https://arxiv.org/html/2608.27550"
+        ],
+        [
+          "作者详细讲解、模型与代码入口",
+          "https://starvla.github.io/VLAct/"
+        ],
+        [
+          "NeurIPS 官方列表",
+          "https://neurips.cc/Downloads/2026"
+        ]
+      ]
+    },
+    {
+      "id": "interp",
+      "name": "Not All Features Are Created Equal",
+      "title": "Not All Features Are Created Equal: A Mechanistic Study of Vision-Language-Action Models",
+      "venue": "NeurIPS",
+      "track": "VLA",
+      "priority": "P1",
+      "status": "NeurIPS 官方 2026 列表已核实；会议尚未举行",
+      "tags": [
+        "可解释性",
+        "因果干预",
+        "语言 grounding"
+      ],
+      "problem": "VLA 成功完成一个固定场景任务，可能来自真正理解指令，也可能来自视觉线索触发固定空间轨迹。普通成功率无法区分这两者。",
+      "method": [
+        "在 rollout 中记录骨干与动作专家激活，训练稀疏自编码器分解潜在行为特征。",
+        "用线性 probe 检查指令是否被编码，再通过特征消融、激活注入和跨任务 steering，检查这些信息是否实际影响行为。",
+        "设置空指令、目标交换、场景变化与范数匹配随机注入对照，避免把相关性或任意扰动当作机制证据。"
+      ],
+      "why": "能从激活中读出指令，不代表动作真的依赖指令。因果干预比可视化 attention 更接近回答模型究竟使用了什么。",
+      "evidence": "作者跨六类策略、多个基准与真机检查语言权重和绝对坐标绑定；效应随模型和度量而变化。",
+      "limit": "阅读判断：结论针对被测试的微调模型与协议，不能推出所有 VLA 都没有语言理解；注入实验也需要结合自然扰动验证。",
+      "read": "读干预设计和随机方向对照，再看真实物体位置改变后的轨迹行为；不要只读醒目的百分比。",
+      "links": [
+        [
+          "作者讲解与代码入口",
+          "https://cwru-aism.github.io/vla-interp-page/"
+        ],
+        [
+          "NeurIPS 官方收录",
+          "https://neurips.cc/Downloads/2026"
+        ]
+      ]
+    },
+    {
+      "id": "dexter",
+      "name": "DextER",
+      "title": "DextER: Language-driven Dexterous Grasp Generation with Embodied Reasoning",
+      "venue": "CVPR",
+      "track": "DexHand",
+      "priority": "P0",
+      "status": "CVF 正式论文集已核实",
+      "tags": [
+        "语言抓取",
+        "接触表示",
+        "可控生成"
+      ],
+      "problem": "一句“握住杯柄方便倒水”既包含任务意图，也要求具体手指在合适表面接触。直接从语言和形状回归手腕与关节，容易得到稳定但不符合用途的抓取。",
+      "method": [
+        "从物体点云与语言指令编码语义及几何上下文。",
+        "先自回归输出 embodied contact tokens：哪个手部连杆、接触物体表面的哪个三维位置。",
+        "再在接触序列条件下生成手腕位姿与手指关节 tokens；也允许用户指定部分接触以引导生成。"
+      ],
+      "why": "将任务语义通过接触落到本体几何上，比直接预测高维关节更有结构。这里的 reasoning 是接触中间表示，不是随意输出一段文字。",
+      "evidence": "DexGYS 上成功率 67.14%，较对照提高 3.83 个百分点；还评估意图对齐和部分接触控制。",
+      "limit": "阅读判断：它主要生成抓取构型，不能由静态抓取成功推出连续指内操作已解决；应同时看物理稳定性与任务意图匹配。",
+      "read": "精读 contact token 的连杆／位置编码、contact-to-grasp 顺序与去掉接触推理的消融；再读 CoorGrasp 看抓取如何真正执行。",
+      "links": [
+        [
+          "CVPR 正式论文",
+          "https://openaccess.thecvf.com/content/CVPR2026/html/Lee_DextER_Language-driven_Dexterous_Grasp_Generation_with_Embodied_Reasoning_CVPR_2026_paper.html"
+        ],
+        [
+          "全文",
+          "https://arxiv.org/html/2601.16046"
+        ]
+      ]
+    },
+    {
+      "id": "unihm",
+      "name": "UniHM",
+      "title": "UniHM: Unified Dexterous Hand Manipulation with Vision Language Model",
+      "venue": "ICLR",
+      "track": "DexHand",
+      "priority": "P0",
+      "status": "ICLR 正式稿与官方收录已核实",
+      "tags": [
+        "跨手型",
+        "动作 tokenizer",
+        "语言序列"
+      ],
+      "problem": "不同手型的关节数量和运动学不同，直接共享关节输出很困难；已有语言抓取又常只生成单帧姿态，缺少连续操作过程。",
+      "method": [
+        "对人类手物交互数据进行语言标注和机器人手重定向，构造多手型序列监督。",
+        "用共享 VQ codebook 与跨手一致性建立 Unified Hand-Dexterous Tokenizer，把动作映射到共同离散空间，再由手型专属解码器恢复关节轨迹。",
+        "VLM 在图像、指令及 token 历史条件下生成序列；分段物理优化结合生成先验、时间平滑与接触约束，改善轨迹可执行性。"
+      ],
+      "why": "共享的是动作的潜在表示，而不是强行把每根手指关节一一对应。生成模型负责语义和动作先验，物理优化处理可行性。",
+      "evidence": "在 DexYCB、OakInk、仿真检查和真机交互上评估未见对象与轨迹，并用消融检查统一码本与物理精炼。",
+      "limit": "作者讨论 RGB-D 感知、简化接触／摩擦能量以及双手和工具任务覆盖不足。阅读判断：同码本迁移仍需要本体解码接口，离线精炼不等于实时触觉闭环。",
+      "read": "先读码本构造与跨手蒸馏，再读物理优化目标；分开看序列预测误差、物理可行性和真机任务成功。",
+      "links": [
+        [
+          "全文",
+          "https://arxiv.org/abs/2603.00732"
+        ],
+        [
+          "ICLR 正式 PDF",
+          "https://openreview.net/pdf?id=cVX3VqO8BO"
+        ],
+        [
+          "官方代码",
+          "https://github.com/Zhenhao-Zhang/UniHM"
+        ]
+      ]
+    },
+    {
+      "id": "dexmachina",
+      "name": "DexMachina",
+      "title": "DexMachina: Functional Retargeting for Bimanual Dexterous Manipulation",
+      "venue": "ICML",
+      "track": "DexHand",
+      "priority": "P0",
+      "status": "PMLR 正式论文集已核实",
+      "tags": [
+        "功能重定向",
+        "课程学习",
+        "双手 RL"
+      ],
+      "problem": "让机器人手姿态像人手，未必能让物体按同样方式运动。双手操作铰接物体时，接触顺序复杂、动作维度高，纯 RL 常在最初阶段不断失败。",
+      "method": [
+        "以示范中的物体位置、旋转和铰接状态轨迹作为功能目标，而不仅是手部运动误差。",
+        "从示范提取重定向关节、关键点及近似接触，提供运动／接触辅助奖励和残差动作引导。",
+        "训练初期由虚拟物体控制器辅助物体跟随目标轨迹，再逐渐减弱辅助，让机器人接管真正的接触与物体运动。"
+      ],
+      "why": "先让策略经历成功任务中的完整状态分布，再逐步承担物理责任，减少高维探索一开始就失败的问题。可以把它理解为训练阶段的“辅助轮”。",
+      "evidence": "在包含六种手型、五类铰接物体的仿真基准上比较策略与硬件能力；正式发表为 ICML 2026，预印本始于 2025。",
+      "limit": "作者指出策略依赖仿真特权状态和高质量手物跟踪。阅读判断：必须确认最终评测已撤掉虚拟帮助；这篇核心证据是仿真，不能视为真机直接部署方案。",
+      "read": "重点读虚拟控制器的强度退火、奖励和课程消融；与 DexImit 对比 RL 功能重定向与规划生成示范。",
+      "links": [
+        [
+          "ICML 正式论文",
+          "https://proceedings.mlr.press/v306/mandi26a.html"
+        ],
+        [
+          "全文",
+          "https://arxiv.org/html/2505.24853"
+        ],
+        [
+          "作者视频与代码入口",
+          "https://project-dexmachina.github.io/"
+        ]
+      ]
+    },
+    {
+      "id": "deximit",
+      "name": "DexImit",
+      "title": "DexImit: Learning Bimanual Dexterous Manipulation from Monocular Human Videos",
+      "venue": "RSS",
+      "track": "DexHand",
+      "priority": "P0",
+      "status": "RSS 官方录用与论文页已核实",
+      "tags": [
+        "单目视频",
+        "数据生成",
+        "双手规划"
+      ],
+      "problem": "互联网视频很丰富，但没有深度、相机参数或机器人动作标签；人手与机器人手差异又使直接模仿不可行。目标是将单目人类视频转成可用于策略训练的物理合理机器人数据。",
+      "method": [
+        "重建手和物体的四维轨迹，用人手尺寸先验恢复近似尺度，并统一到世界坐标系。",
+        "将视频分解为 pregrasp、grasp、motion、release 等子动作，调度双手的合作、并行与异步操作。",
+        "生成满足力闭合及碰撞约束的抓取候选，按与人类示范的一致性排序，通过运动规划产生机器人轨迹。",
+        "随机化物体位置／尺度、相机和视觉外观，扩大由单个示范衍生的数据分布，再训练执行策略。"
+      ],
+      "why": "它把视频里的任务意图转换成机器人自身可行的交互方案，用几何、接触和规划桥接本体差异。",
+      "evidence": "覆盖工具、长程与精细双手任务，并报告由合成数据训练的策略在所测试真机任务上零样本部署。",
+      "limit": "论文允许复杂长程任务使用可选人工标注。阅读判断：重建尺度、物体 mesh、遮挡与任务分解都会影响数据质量；生成视频也不自动保证物理正确。",
+      "read": "精读重建→调度→抓取规划→增强四阶段；看重建误差是否仍能产生可用示范，再与 DexMachina 比较。",
+      "links": [
+        [
+          "RSS 论文页",
+          "https://roboticsconference.org/2026/program/papers/3/"
+        ],
+        [
+          "全文",
+          "https://arxiv.org/html/2602.10105"
+        ],
+        [
+          "作者视频与讲解",
+          "https://mujc2021.github.io/deximit/"
+        ]
+      ]
+    },
+    {
+      "id": "dexwm",
+      "name": "DexWM",
+      "title": "World Models for Learning Dexterous Hand-Object Interactions from Human Videos",
+      "venue": "ECCV",
+      "track": "DexHand",
+      "priority": "P0",
+      "status": "ECCV 官方录用列表已核实",
+      "tags": [
+        "潜在世界模型",
+        "人类视频",
+        "MPC"
+      ],
+      "problem": "粗粒度文字或手腕动作无法描述手指接触。只优化整体视觉预测又会忽略画面中占比很小、对操作却很关键的手部区域。",
+      "method": [
+        "把第一视角视频中的手指／手腕关键点作为精细动作表示，以视觉 patch embedding 作为世界状态。",
+        "用动作条件预测器回归未来潜在状态；额外要求预测状态能恢复手部关键点，加入 hand consistency loss。",
+        "以世界模型预测候选动作后果，用 CEM 在 MPC 中优化通往目标图像的轨迹，并滚动执行。"
+      ],
+      "why": "可迁移的视觉状态加上可指定的细粒度动作，形成“假如这样移动手指，会发生什么”的预测接口。局部手部约束弥补全图损失对精细动作不敏感的问题。",
+      "evidence": "使用 900+ 小时人类及普通机器人数据；适配机器人时还有约四小时非任务专属仿真探索数据。真机抓取报告 83%，样本为 10/12。",
+      "limit": "论文承认仿真适配依赖和静态场景假设。阅读判断：12 次试验只提供初步落地证据；该系统以图像目标规划，不能直接归为语言条件 VLA。",
+      "read": "精读动作定义、hand consistency loss 和 CEM/MPC；同时比较潜在预测误差、手部 PCK 与任务成功。",
+      "links": [
+        [
+          "ECCV 官方收录",
+          "https://eccv.ecva.net/Conferences/2026/AcceptedPapers"
+        ],
+        [
+          "全文",
+          "https://arxiv.org/html/2512.13644"
+        ],
+        [
+          "作者项目",
+          "https://raktimgg.github.io/dexwm/"
+        ]
+      ]
+    },
+    {
+      "id": "dwm",
+      "name": "Dexterous World Models / DWM",
+      "title": "Dexterous World Models",
+      "venue": "CVPR",
+      "track": "DexHand",
+      "priority": "P1",
+      "status": "CVF 正式论文集已核实",
+      "tags": [
+        "视频世界模型",
+        "数字孪生",
+        "场景一致性"
+      ],
+      "problem": "静态数字孪生只能支持看和导航；通用视频生成又容易在动作发生时改写整个背景。问题是如何在保持场景和相机一致的同时，预测手部动作引起的局部世界变化。",
+      "method": [
+        "沿给定相机轨迹渲染静态场景视频，作为不受交互影响的背景基线。",
+        "把第一视角手 mesh 的几何与运动渲染为第二路条件，明确指定细粒度动作。",
+        "从预训练视频 inpainting diffusion 模型初始化，学习交互引起的变化；结合配对合成场景与真实固定相机操作数据训练。"
+      ],
+      "why": "把静态世界外观和交互动态拆开，降低同时重建背景与预测操作的难度。它与 DexWM 的区别在于这里输出交互视频，重点是场景一致的视觉模拟。",
+      "evidence": "在合成及真实第一视角数据上评估动作响应、场景一致性，也探索基于预测视觉后果的候选动作评价。",
+      "limit": "阅读判断：视频合理和物理可靠是两个指标。论文不能据此替代接触求解器，也不直接输出机器人关节命令；应与可闭环控制的 DexWM 分开读。",
+      "read": "读两路条件、inpainting 初始化和静态一致性评测；特别检查换动作能否改变结果而背景保持稳定。",
+      "links": [
+        [
+          "CVPR 正式论文",
+          "https://openaccess.thecvf.com/content/CVPR2026/html/Kim_Dexterous_World_Models_CVPR_2026_paper.html"
+        ],
+        [
+          "论文",
+          "https://arxiv.org/abs/2512.17907"
+        ],
+        [
+          "作者讲解与视频",
+          "https://snuvclab.github.io/dwm/"
+        ]
+      ]
+    },
+    {
+      "id": "coorgrasp",
+      "name": "CoorGrasp",
+      "title": "CoorGrasp: Coordinated Contact Control for Adaptive Dexterous Grasping Under Uncertainty",
+      "venue": "ICRA",
+      "track": "DexHand",
+      "priority": "P1",
+      "status": "作者项目标注 ICRA 2026 Oral；另有 workshop poster 奖，二者分开",
+      "tags": [
+        "触觉闭环",
+        "多接触协调",
+        "MPC"
+      ],
+      "problem": "计划的抓取位姿再漂亮，真实物体位置误差也会让一根手指先碰到、把物体推走。执行阶段需要协调接触形成和受力，而不仅是跟踪关节目标。",
+      "method": [
+        "基于所有接触能否形成平衡受力划分接近与抓持阶段，而不是每根手指各自切换。",
+        "接近阶段用手臂与手指协同修正全局位置，并维持轻柔接触，避免为补偿位置误差破坏计划手型。",
+        "建立关节运动到接触力变化的解析模型，用触觉驱动 MPC；抓持阶段实时重新分配各接触目标力，平衡地增加抓持力。"
+      ],
+      "why": "它补齐“生成抓取”到“执行抓取”的缺口。多指同步不是同时闭合，而是让净力／力矩不要在接触形成过程中把物体移走。",
+      "evidence": "论文评估 15k 次抓取、478 个物体、三种手型的仿真，并有八个真实物体实验，检查成功率与物体不期望运动。",
+      "limit": "模型假设接触位置、法向与力可测，采用带摩擦的点接触。阅读判断：这些传感和模型要求决定了它能否接入你的硬件。",
+      "read": "读阶段转换准则、臂手耦合与 force allocation；和 DextER 组成抓取生成→闭环执行阅读对。",
+      "links": [
+        [
+          "作者会议信息、讲解与代码入口",
+          "https://ada-grasp-ctrl.github.io/"
+        ],
+        [
+          "全文",
+          "https://arxiv.org/html/2607.03557"
+        ]
+      ]
+    },
+    {
+      "id": "dexx",
+      "name": "DEX-X",
+      "title": "DEX-X: Learning Visual-Tactile Dexterous Manipulation From Human Videos with Simulated Interaction",
+      "venue": "CoRL",
+      "track": "DexHand",
+      "priority": "P0",
+      "status": "作者项目明确标注 CoRL 2026 accepted；尚未另核会议正式论文集",
+      "tags": [
+        "触觉补全",
+        "教师学生",
+        "Sim-to-Real"
+      ],
+      "problem": "人类视频能展示操作，却不告诉机器人接触时有什么感觉。直接从视频学视觉策略，缺少滑动、握持和工具使用所需的接触监督。",
+      "method": [
+        "将单目示范的手物交互重建并重定向到仿真，用接触动力学产生原视频没有的触觉监督。",
+        "用示范参考、物体状态和触觉信息训练特权状态 RL 专家，再蒸馏为可部署学生策略。",
+        "把指尖触觉通过运动学放入统一接触点云，融合视觉、触觉和本体信息，并做真实手臂平台零样本部署。"
+      ],
+      "why": "仿真在这里既提供练习环境，也补全视频缺失的物理模态；蒸馏则把训练时的全状态知识转为部署时可获得的观测。",
+      "evidence": "作者报告仿真教师六类任务平均 65.9%；FR3+Sharpa Wave 真机抓方块 93%、清桌 53%。这些是不同任务，不能直接互相比较。",
+      "limit": "作者指出部署仍依赖重定向运动参考；触觉表示主要为指尖力幅值，未包含高分辨率压力、剪切和滑移。大幅几何变化及长程任务仍困难。",
+      "read": "精读触觉仿真→RL 教师→统一接触点云→蒸馏；检查去触觉消融以及仿真／真实触觉定义是否一致。",
+      "links": [
+        [
+          "作者讲解与录用声明",
+          "https://dexx-code.github.io/dexx-code/"
+        ],
+        [
+          "全文",
+          "https://arxiv.org/html/2609.07747"
+        ]
+      ]
+    },
+    {
+      "id": "dexflex",
+      "name": "DexFLEX",
+      "title": "DexFLEX: Contact-Aware Foundation Controller for Command-Guided Dexterity",
+      "venue": "CoRL",
+      "track": "DexHand",
+      "priority": "P0",
+      "status": "作者项目与作者机构页标注 CoRL 2026；尚未另核会议正式论文集",
+      "tags": [
+        "低层基础控制器",
+        "触觉",
+        "世界模型"
+      ],
+      "problem": "遥操作或视觉策略知道想怎么移动指尖，却经常没有规定支撑指、接触切换和保持物体稳定的细节。忠实复制上游动作可能反而使物体掉落。",
+      "method": [
+        "从触觉和本体历史编码当前接触状态，用运动先验产生短时指尖动作片段。",
+        "同时产生跟随上游 draft 的候选及来自纯先验的恢复候选；在潜在世界模型里预测每个候选的接触后果。",
+        "以命令一致性与接触稳定性评分选优，再用逆动力学解码为关节目标，持续滚动执行 Draft-Dream-Select。"
+      ],
+      "why": "把上游动作当作意图证据，低层仍对可行性和稳定性负责。它提供了高层 VLA 与精细接触控制之间可复用的接口。",
+      "evidence": "六个工具任务、每任务 20 次试验：作者报告遥操作均值从 29.2% 到 78.3%；同一冻结控制器也用于视觉模仿策略。",
+      "limit": "阅读判断：证据来自特定 LEAP+xArm+FlexiTac 平台，不能直接推断任意手型即插即用。候选预测和评分的计算延迟也需纳入实际闭环。",
+      "read": "读双路候选、后果预测、contrastive scorer 与逆动力学解码；重点比较纯 prior、无触觉及直接 joint prediction。",
+      "links": [
+        [
+          "作者详细讲解与 PDF",
+          "https://dex-flex.github.io/"
+        ],
+        [
+          "作者机构会议信息",
+          "https://www.hichristensen.com/publication/2026-corl-dexflex/"
+        ]
+      ]
+    },
+    {
+      "id": "grounding",
+      "name": "Grounding Sim-to-Real Generalization",
+      "title": "Grounding Sim-to-Real Generalization in Dexterous Manipulation: An Empirical Study with Vision-Language-Action Models",
+      "venue": "ECCV",
+      "track": "VLA",
+      "priority": "P1",
+      "status": "ECCV 官方录用标题已核实；arXiv v2 标题改用 Robotic Manipulation",
+      "tags": [
+        "评测",
+        "域随机化",
+        "真实机器人"
+      ],
+      "problem": "域随机化、照片级渲染和 RL 都常被说成有助迁移，但各自效果容易被不同实验设置混淆。论文问：在统一真机协议中，究竟哪些仿真因素影响最大？",
+      "method": [
+        "固定 OpenVLA-OFT 与双臂操作平台，因子化改变背景、干扰物、相机、光照和桌面高度。",
+        "比较逐回合与逐帧随机化，控制渲染／物理保真设置，并比较纯 SFT 与 RL 后训练。",
+        "按视觉、语义、空间和执行变化设计真实机器人评测，用一万多次真实试验检验迁移。"
+      ],
+      "why": "它以大规模受控实验给训练资源分配提供依据：空间变化、时间粒度与 RL 可能产生不同于外观变化的收益。",
+      "evidence": "所读 v2 报告空间随机化影响大于纯外观扰动，逐帧随机化有帮助，提高仿真保真有边际收益递减，RL 与结构化随机化互补。",
+      "limit": "关键边界：所读实验是双臂夹爪，并非多指灵巧手。结论来自特定模型、任务与随机化范围，不能直接推广为所有机器人统一最佳配方。",
+      "read": "先读真实平台与因子控制，再读域随机化及 RL 结果；不要根据会议标题里的 Dexterous 就把它归为多指控制证据。",
+      "links": [
+        [
+          "ECCV 官方录用标题",
+          "https://eccv.ecva.net/Conferences/2026/AcceptedPapers"
+        ],
+        [
+          "所读 arXiv v2 全文",
+          "https://arxiv.org/html/2603.22876"
+        ],
+        [
+          "原始摘要",
+          "https://arxiv.org/abs/2603.22876"
+        ]
+      ]
+    }
+  ]
+}
